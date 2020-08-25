@@ -3,7 +3,6 @@ package com.dhar.restapi.controller;
 import com.dhar.restapi.controller.v1.api.TodoController;
 import com.dhar.restapi.dto.model.TaskDto;
 import com.dhar.restapi.service.TodoService;
-import org.apache.catalina.security.SecurityConfig;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
