@@ -1,2 +1,2 @@
-# spring-greeting-api
-Sample Greetings Rest API service
+# spring-todo-api
+Sample TODO Rest API service
