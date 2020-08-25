@@ -2,9 +2,11 @@ package com.dhar.restapi.service;
 
 import com.dhar.restapi.dto.model.TaskDto;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+
 
 public interface TodoService {
-    TaskDto addTaskByName(String name);
-    List<TaskDto> searchTaskByName(String query);
+    Optional<TaskDto> addTaskByName(String name);
+    Optional<ArrayList<TaskDto>> searchTaskByName(String query);
 }

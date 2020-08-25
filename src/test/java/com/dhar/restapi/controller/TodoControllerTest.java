@@ -1,38 +1,71 @@
 package com.dhar.restapi.controller;
 
-import com.dhar.restapi.controller.api.TodoController;
+import com.dhar.restapi.controller.v1.api.TodoController;
 import com.dhar.restapi.dto.model.TaskDto;
 import com.dhar.restapi.service.TodoService;
+import org.apache.catalina.security.SecurityConfig;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+
+import java.util.ArrayList;
+import java.util.Optional;
+
 import static org.mockito.Mockito.when;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(TodoController.class)
+@ExtendWith(MockitoExtension.class)
 public class TodoControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    TodoController todoController;
 
-    @MockBean
+    @Mock
     private TodoService service;
 
     @Test
-    public void greetingShouldReturnMessageFromService() throws Exception {
-        String response = "{\"id\":1,\"content\":\"Hello, World!\"}";
-        TaskDto taskDto = new TaskDto(1, "Mock");
-        when(service.addTaskByName("Mock")).thenReturn(taskDto);
-        this.mockMvc.perform(get("/api/v1/todo/addtask")).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(response));
+    public void addTaskShouldReturnSuccessResponse() throws Exception {
+        TaskDto taskDto = new TaskDto(1, "World");
+        when(service.addTaskByName("World")).thenReturn(Optional.of(taskDto));
+        final ResponseEntity<TaskDto> responseDto = todoController.addTask("World");
+
+        Assert.assertEquals(200, responseDto.getStatusCodeValue());
+        Assert.assertEquals(taskDto, responseDto.getBody());
+    }
+
+    @Test
+    public void addTaskShouldReturnFailureResponse() throws Exception {
+        when(service.addTaskByName("World")).thenReturn(Optional.empty());
+        final ResponseEntity<TaskDto> responseDto = todoController.addTask("World");
+
+        Assert.assertEquals(400, responseDto.getStatusCodeValue());
+        Assert.assertNull(responseDto.getBody());
+    }
+
+    @Test
+    public void ShouldReturnSuccessResponseForSearchTodoTasks() throws Exception {
+        ArrayList<TaskDto> taskList = new ArrayList<>();
+        taskList.add(new TaskDto(1, "World"));
+
+        when(service.searchTaskByName("World")).thenReturn(Optional.of(taskList));
+        final ResponseEntity<ArrayList<TaskDto>> responseDto = todoController.searchTask("World");
+
+        Assert.assertEquals(200, responseDto.getStatusCodeValue());
+        ArrayList<TaskDto> taskListResponse = responseDto.getBody();
+        assert taskListResponse != null;
+        Assert.assertEquals(1, taskListResponse.size());
+    }
+
+    @Test
+    public void ShouldReturnFailureResponseForSearchTodoTasks() throws Exception {
+        when(service.addTaskByName("World")).thenReturn(Optional.empty());
+        final ResponseEntity<TaskDto> responseDto = todoController.addTask("World");
+
+        Assert.assertEquals(400, responseDto.getStatusCodeValue());
+        Assert.assertNull(responseDto.getBody());
     }
 }
